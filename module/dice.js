@@ -150,7 +150,7 @@ export async function _onCheckRoll(actor, valor, habilidadNombre) {
                 normal: {
                     label: game.i18n.localize("Hitos.Roll.Tirar"),
                     callback: async (html) => {
-                        let values = _rolld10(valor);
+                        let values = await _rolld10(valor);
                         let total =
                             Number(html[0].querySelectorAll("option:checked")[0].value) +
                             Number(html[0].querySelectorAll(".bonus")[0].value) +
@@ -180,9 +180,10 @@ export async function _onCheckRoll(actor, valor, habilidadNombre) {
                         ChatMessage.create({
                             content: html,
                             speaker: {alias: actor.name},
-                            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+                            type: CONST.CHAT_MESSAGE_STYLES.ROLL,
                             rollMode: game.settings.get("core", "rollMode"),
-                            roll: values[0]
+                            roll: values[0],
+                            rolls: [values[0]],
                         });
                     },
                 },
@@ -193,8 +194,9 @@ export async function _onCheckRoll(actor, valor, habilidadNombre) {
     });
 }
 
-function _rolld10(valor) {
-    let d10Roll = new Roll("1d10+1d10+1d10").roll({async: false});
+async function _rolld10(valor) {
+    let d10Roll = await (new Roll("1d10+1d10+1d10")).roll();
+    console.log(d10Roll);
     let d10s = d10Roll.result.split(" + ").sort((a, b) => a - b);
     let result = Number(d10s[1]) + Number(valor);
     return [d10Roll, d10s, result];

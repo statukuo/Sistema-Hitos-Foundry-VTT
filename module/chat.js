@@ -1,5 +1,7 @@
 export function addChatListeners(html){
-    html.on('click','.drama-roll',onDramaRoll)
+    html.querySelectorAll('.drama-roll').forEach(button => {
+        button.addEventListener('click', onDramaRoll);
+    });
 };
 
 function sumDuplicate(arr){
@@ -77,7 +79,7 @@ async function onDramaRoll(event){
                         let dicesNew = [];
                         let result = 0;
                         selectedDices.forEach(dice => {dicesNew.push(Number(dice.value))});
-                        let newRoll = await new Roll((3 - Number(dicesNew.length)) + "d10").roll({async: true});
+                        let newRoll = await (new Roll((3 - Number(dicesNew.length)) + "d10")).roll();
                         newRoll.terms[0].results.forEach(result => {dicesNew.push(result.result)})
                         if(afectar === "1"){
                             result = Math.max(...sumDuplicate(dicesNew)) + mods
@@ -102,12 +104,14 @@ async function onDramaRoll(event){
                             config: CONFIG.hitos,
                         };
                         html = await renderTemplate(template, dialogData);
+
                         ChatMessage.create({
                             content: html,
                             speaker: {alias: actor.name},
-                            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+                            type: CONST.CHAT_MESSAGE_STYLES.ROLL,
                             rollMode: game.settings.get("core", "rollMode"),
-                            roll: newRoll
+                            roll: newRoll,
+                            rolls: [newRoll],
                         });
                     },
                 },
